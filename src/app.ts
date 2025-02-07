@@ -2,6 +2,10 @@ import express from 'express'
 import routes from './routes'
 
 const app = express()
+
+// for CAS Single Logout
+app.use(express.urlencoded({ extended: false }));
+
 app.use(routes)
 
 const listenOn = Number(process.env.PORT || 3000)

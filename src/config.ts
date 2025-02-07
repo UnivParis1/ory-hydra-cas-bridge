@@ -17,6 +17,8 @@ export const hydraAdmin = new OAuth2Api(
 export const our_base_url = 'https://oidc.univ.fr/hydra-cas-bridge'
 export const cas_server_base_url = 'https://cas.univ.fr/cas'
 
+export const ticket_to_session_dir = '/var/lib/hydra-cas-bridge--ticket-to-session';
+
 // https://wiki.refeds.org/display/GROUPS/Mapping+SAML+attributes+to+OIDC+Claims
 export const supann_to_oidc_attr: to_oidc_attr = {
     mono: {

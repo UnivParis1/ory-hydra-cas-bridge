@@ -2,7 +2,7 @@ import express from 'express'
 import fetch from 'node-fetch'
 import { cas_server_base_url } from './config'
 
-interface Dictionary<T> { [key: string]: T; }
+export interface Dictionary<T> { [key: string]: T; }
 
 export interface to_oidc_attr { mono: Dictionary<string>, multi: Dictionary<string> }
 
