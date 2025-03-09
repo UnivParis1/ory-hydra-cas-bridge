@@ -16,6 +16,10 @@ export const handle_error = (callback: (req : express.Request, res: express.Resp
     }
 }
 
+export const toArray = (s: string | string[]) => (
+    typeof s === 'string' ? [s] : s
+)
+
 function decodeEntities(encodedString: string) {
     const translate_re = /&(apos|quot|amp|lt|gt);/g;
     const translate: Dictionary<string> = { apos: "'", quot: '"', amp : "&", lt  : "<", gt  : ">" };

@@ -1,5 +1,5 @@
-import { OAuth2Api, Configuration } from '@ory/hydra-client'
-import { to_oidc_attr } from './helpers'
+import { OAuth2Api, Configuration, OAuth2Client, RejectOAuth2Request } from '@ory/hydra-client'
+import { Dictionary, to_oidc_attr } from './helpers'
 
 const baseOptions: any = {}
 
@@ -30,6 +30,13 @@ export const supann_to_oidc_attr: to_oidc_attr = {
     },
     multi: {
         eduPersonAffiliation: "eduperson_affiliation",
+
+        // pas envoyé aux clients
+        memberOf: "memberOf",
     },
 }
 
+export type attrs = { groups?: string[] } & Dictionary<string | string[]>
+export const may_modify_attrs__check_user_allowed = (cas_attrs: attrs, client: OAuth2Client) : RejectOAuth2Request | null => {
+    return null
+}    

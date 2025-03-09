@@ -1,6 +1,6 @@
 import express from 'express'
-import { cas_server_base_url, hydraAdmin, our_base_url, supann_to_oidc_attr, ticket_to_session_dir } from './config'
-import { handle_error, casv2_validate_ticket } from './helpers'
+import { cas_server_base_url, may_modify_attrs__check_user_allowed, hydraAdmin, our_base_url, supann_to_oidc_attr, ticket_to_session_dir, attrs } from './config'
+import { handle_error, casv2_validate_ticket, toArray } from './helpers'
 import file_backed_dictionary from './file_backed_dictionary'
 
 const router = express.Router()
@@ -36,12 +36,34 @@ router.get('/login', handle_error(async (req, res) => {
         res.redirect(cas_server_base_url + "/login?service=" + encodeURIComponent(ourUrl))
     } else {
         const ticket = String(req.query.ticket)
-        const cas_response = await casv2_validate_ticket(supann_to_oidc_attr, ourUrl, ticket)
+        const attrs: attrs = await casv2_validate_ticket(supann_to_oidc_attr, ourUrl, ticket)
 
         if (!loginRequest.session_id) throw "internal error";
 
         // NB: not waiting for write to complete
         ticket_to_session.set(ticket, loginRequest.session_id)
+
+        if (loginRequest.requested_scope.includes('groups') && attrs.memberOf) {
+            // @ts-expect-error (il ne voit pas le filter...)
+            attrs.groups = toArray(attrs.memberOf).map(s => s.match(/^cn=(.*?),/)?.[1]).filter(s => s)
+        }
+
+        const rejectOAuth2Request = may_modify_attrs__check_user_allowed(attrs, loginRequest.client)
+        if (rejectOAuth2Request) {
+            if (rejectOAuth2Request.error === 'access_denied') {
+                console.info(attrs.subject, " not allowed to access", loginRequest.client.client_name || loginRequest.client.client_id)
+                rejectOAuth2Request.error_description = "Vous n'êtes pas autorisé à accéder à cette application"
+            }
+            const { data } = await hydraAdmin.rejectOAuth2LoginRequest({
+                loginChallenge,
+                rejectOAuth2Request,
+            })
+            res.redirect(data.redirect_to)
+            return
+        }
+
+        // on utilise memberOf uniquement pour may_modify_attrs__check_user_allowed & "groups"
+        delete attrs.memberOf
 
 
         // tell hydra:
@@ -49,8 +71,8 @@ router.get('/login', handle_error(async (req, res) => {
             // remember neccesary for revokeOAuth2LoginSessions by "sid" (cf HandleHeadlessLogout > GetRememberedLoginSession , https://github.com/ory/hydra/blob/master/consent/strategy_default.go#L1102 )
             remember: true,
             remember_for: 0, // pas d'expiration
-            subject: String(cas_response.subject),
-            context: cas_response,
+            subject: String(attrs.subject),
+            context: attrs,
         } })
         // redirect the user back to hydra
         res.redirect(String(acceptResp.redirect_to))
