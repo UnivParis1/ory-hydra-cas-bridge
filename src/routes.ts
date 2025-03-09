@@ -31,7 +31,7 @@ router.get('/login', handle_error(async (req, res) => {
 
     const { data: loginRequest } = await hydraAdmin.getOAuth2LoginRequest({ loginChallenge }) // needed?
     
-    const ourUrl = our_base_url + '/login?login_challenge=' + encodeURIComponent(loginChallenge)
+    const ourUrl = our_base_url + '/login?login_challenge=' + encodeURIComponent(loginChallenge) + "&client=" + encodeURIComponent(loginRequest.client.client_name || '')
     if (!req.query.ticket) {
         res.redirect(cas_server_base_url + "/login?service=" + encodeURIComponent(ourUrl))
     } else {
