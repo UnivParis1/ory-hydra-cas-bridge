@@ -11,7 +11,14 @@ export const handle_error = (callback: (req : express.Request, res: express.Resp
         await callback(req, res)
     } catch (err) {
         console.error(err)
-        res.send("err")
+        const msg = `
+        <div class="erreur">Erreur</div>
+            ${err === 'LOGIN_REQUEST_EXPIRED' ? 
+            `Il semble que vous soyez resté trop longtemps sur la page d'authentification.` : `Veuillez ré-essayer ultérieurement`}
+        
+            <button onclick="window.history.back()">Réessayer</button>
+        </div>`
+        res.send(msg)
     }
 }
 

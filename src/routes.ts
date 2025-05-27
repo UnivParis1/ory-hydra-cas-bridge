@@ -2,6 +2,7 @@ import express from 'express'
 import { cas_server_base_url, may_modify_attrs__check_user_allowed, hydraAdmin, our_base_url, supann_to_oidc_attr, ticket_to_session_dir, attrs } from './config'
 import { handle_error, casv2_validate_ticket, toArray } from './helpers'
 import file_backed_dictionary from './file_backed_dictionary'
+import AxiosStatic from '@ory/hydra-client/node_modules/axios'
 
 const router = express.Router()
 const ticket_to_session = file_backed_dictionary(ticket_to_session_dir, {
@@ -29,7 +30,13 @@ router.get('/login', handle_error(async (req, res) => {
     const loginChallenge = String(req.query.login_challenge)
     if (!loginChallenge) throw new Error('Expected a login challenge')
 
-    const { data: loginRequest } = await hydraAdmin.getOAuth2LoginRequest({ loginChallenge }) // needed?
+    let loginRequest 
+    try {
+        loginRequest = (await hydraAdmin.getOAuth2LoginRequest({ loginChallenge })).data
+    } catch (err) {
+        throw AxiosStatic.isAxiosError(err) && err.response?.status === 401 ?
+            'LOGIN_REQUEST_EXPIRED' : err
+    }
     
     const ourUrl = our_base_url + '/login?login_challenge=' + encodeURIComponent(loginChallenge) + "&client=" + encodeURIComponent(loginRequest.client.client_name || '')
     if (!req.query.ticket) {
