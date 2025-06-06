@@ -3,7 +3,7 @@ import { cas_server_base_url } from './config'
 
 export interface Dictionary<T> { [key: string]: T; }
 
-export interface to_oidc_attr { mono: Dictionary<string>, multi: Dictionary<string> }
+export interface to_oidc_attr { mono: Dictionary<string | ((value: string) => {attr: string, value: string}[])>, multi: Dictionary<string> }
 
 // to remove with Express v5, see https://stackoverflow.com/a/38083802/3005203
 export const handle_error = (callback: (req : express.Request, res: express.Response) => Promise<void>): express.RequestHandler => async (req, res) => {
@@ -43,7 +43,13 @@ function getCasAuthSuccessValues(to_oidc_attr: to_oidc_attr, successXml: string)
         const val = decodeEntities(match[2])
         const oidc_attr_mono = to_oidc_attr.mono[match[1]]
         if (oidc_attr_mono) {
-            r[oidc_attr_mono] = val
+            if (typeof oidc_attr_mono === 'function') {
+                for (const { attr, value} of oidc_attr_mono(val)) {
+                    r[attr] = value
+                }
+            } else {
+                r[oidc_attr_mono] = val
+            }
         } else {
             const oidc_attr_multi = to_oidc_attr.multi[match[1]]            
             if (oidc_attr_multi) {
