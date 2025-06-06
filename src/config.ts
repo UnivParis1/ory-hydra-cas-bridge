@@ -26,7 +26,8 @@ export const supann_to_oidc_attr: to_oidc_attr = {
         mail: "email",
         givenName: "given_name",
         sn: "family_name",
-        displayName: "preferred_username",
+        displayName: "name",
+        eduPersonPrincipalName: "preferred_username",
     },
     multi: {
         eduPersonAffiliation: "eduperson_affiliation",
