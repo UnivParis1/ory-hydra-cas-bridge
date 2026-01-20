@@ -1,8 +1,9 @@
 import express from 'express'
-import { cas_server_base_url, may_modify_attrs__check_user_allowed, hydraAdmin, our_base_url, supann_to_oidc_attr, ticket_to_session_dir, attrs } from './config'
-import { handle_error, casv2_validate_ticket, toArray } from './helpers'
-import file_backed_dictionary from './file_backed_dictionary'
-import AxiosStatic from '@ory/hydra-client/node_modules/axios'
+import { cas_server_base_url, may_modify_attrs__check_user_allowed, hydraAdmin, our_base_url, supann_to_oidc_attr, ticket_to_session_dir } from './config.ts'
+import type { attrs } from './config.ts'
+import { handle_error, casv2_validate_ticket, toArray } from './helpers.ts'
+import file_backed_dictionary from './file_backed_dictionary.ts'
+import AxiosStatic from 'axios'
 
 const router = express.Router()
 const ticket_to_session = file_backed_dictionary(ticket_to_session_dir, {

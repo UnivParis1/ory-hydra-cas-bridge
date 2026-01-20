@@ -1,5 +1,5 @@
 import express from 'express'
-import { cas_server_base_url } from './config'
+import { cas_server_base_url } from './config.ts'
 
 export interface Dictionary<T> { [key: string]: T; }
 

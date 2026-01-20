@@ -1,5 +1,7 @@
-import { OAuth2Api, Configuration, OAuth2Client, RejectOAuth2Request } from '@ory/hydra-client'
-import { Dictionary, to_oidc_attr } from './helpers'
+import { OAuth2Api, Configuration } from '@ory/hydra-client'
+import type { OAuth2Client, RejectOAuth2Request } from '@ory/hydra-client'
+import type { to_oidc_attr } from './helpers.ts'
+import type { Dictionary } from './helpers.ts'
 
 const baseOptions: any = {}
 

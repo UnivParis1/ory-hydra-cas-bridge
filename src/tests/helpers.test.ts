@@ -1,5 +1,5 @@
 import * as assert from "assert"
-import * as helpers from "../helpers"
+import * as helpers from "../helpers.ts"
 
 const h = helpers.export_for_tests
 
