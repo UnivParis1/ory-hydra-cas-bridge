@@ -70,7 +70,7 @@ router.get('/login', handle_error(async (req, res) => {
         const { data: acceptResp } = await hydraAdmin.acceptOAuth2LoginRequest({ loginChallenge, acceptOAuth2LoginRequest: { 
             // remember neccesary for revokeOAuth2LoginSessions by "sid" (cf HandleHeadlessLogout > GetRememberedLoginSession , https://github.com/ory/hydra/blob/master/consent/strategy_default.go#L1102 )
             remember: true,
-            remember_for: 0, // pas d'expiration
+            remember_for: 8/*heures*/ * 60 * 60,
             subject: String(attrs.subject),
             context: attrs,
         } })
