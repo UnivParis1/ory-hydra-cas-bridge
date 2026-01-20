@@ -1,5 +1,4 @@
 import express from 'express'
-import fetch from 'node-fetch'
 import { cas_server_base_url } from './config'
 
 export interface Dictionary<T> { [key: string]: T; }
